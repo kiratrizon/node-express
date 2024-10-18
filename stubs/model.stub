@@ -1,0 +1,10 @@
+const Model = require("../Main/Model");
+
+class {{ classname }} extends Model {
+    constructor() {
+        super('{{ lowercasePluralizedClassname }}');
+        this.setAlias(this.constructor.name);
+    }
+}
+
+module.exports = {{ classname }};
