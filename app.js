@@ -8,12 +8,12 @@ const Auth = require('./libs/Middleware/Auth');
 
 function ensureAuthenticated(role = 'user') {
     return (req, res, next) => {
-        req.auth.guarded(role);
-        // if (req.auth.isAuthenticated()) {
-            return next();
-        // } else {
-        //     return res.redirect('/login');
-        // }
+        if (!req.session[role]){
+            req.session[role] = new Auth();
+        }
+        if (req.session[role].isAuthenticated()){
+
+        }
     };
 }
 
@@ -77,17 +77,6 @@ app.use('/', ensureAuthenticated('user'), userRouter);
 app.use('/', guestAuth('user'), userGuest);
 
 app.use('/api', apiRouter);
-
-// app.get('/login', (req, res, next) => {
-//     req.auth.guarded('user');
-//     if (!req.auth.isAuthenticated()) {
-//         return next();
-//     } else {
-//         return res.redirect('/');
-//     }
-// }, (req, res) => {
-//     res.render('login'); // 'login' refers to a view inside the User directory
-// });
 
 
 module.exports = app;
