@@ -1,5 +1,6 @@
 const DatabaseConnection = require('../../database/database');
 const db = new DatabaseConnection();
+const bcrypt = require('bcryptjs');
 
 class Core {
     constructor(tableName) {
@@ -8,7 +9,7 @@ class Core {
         this.values = [];
     }
 
-    async find(type = 'all', options = {}) {
+    async find(type, options) {
         let sql = `SELECT `;
         const conditions = options.conditions || {};
         const joins = options.joins || [];
@@ -39,7 +40,7 @@ class Core {
 
         try {
             let data = await db.runQuery(sql, this.values);
-            return data;
+            return type === 'first' ? data[0] : data;
         } catch (error) {
             console.error("Error executing query:", error);
             throw error;
@@ -213,6 +214,46 @@ class Core {
     
         return `${limitClause} ${offsetClause}`.trim(); // Trim to avoid leading spaces
     }
+
+    async create(data = {}) {
+        data.created_at = new Date().toISOString();
+        data.updated_at = new Date().toISOString();
+
+        try {
+            let result = await this.insert(data);
+            console.log(result);
+            if (result){
+                return result.lastID;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.error("Error creating record:", error);
+            throw error;
+        }
+    }
+
+    async insert(data = {}) {
+        if (!data || Object.keys(data).length === 0) {
+            throw new Error('No data provided for insertion.');
+        }
+    
+        const columns = Object.keys(data).join(', ');
+        const placeholders = Object.keys(data).map(() => '?').join(', ');
+    
+        const sql = `INSERT INTO ${this.tableName} (${columns}) VALUES (${placeholders})`;
+    
+        const values = Object.values(data);
+    
+        try {
+            const result = await db.runQuery(sql, values);
+            return result;
+        } catch (error) {
+            throw new Error(`Error inserting data: ${error.message}`);
+        }
+    }
+    
+    
 }
 
 module.exports = Core;

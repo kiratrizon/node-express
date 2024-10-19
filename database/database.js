@@ -36,18 +36,30 @@ class DatabaseConnection {
                     if (err) {
                         return reject(err);
                     }
-                    resolve(results);
+                    resolve(results); // For SELECT, returns the result set
                 });
             } else if (this.databaseType === 'sqlite') {
-                this.connection.all(query, params, (err, rows) => {
-                    if (err) {
-                        return reject(err);
-                    }
-                    resolve(rows);
-                });
+                // Check if the query starts with SELECT
+                if (query.trim().toLowerCase().startsWith('select')) {
+                    this.connection.all(query, params, (err, rows) => { // For SELECT
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve(rows); // Return the rows fetched from the SELECT query
+                    });
+                } else {
+                    // For INSERT, UPDATE, DELETE
+                    this.connection.run(query, params, function (err) {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve({ changes: this.changes, lastID: this.lastID }); // Return changes and last ID
+                    });
+                }
             }
         });
     }
+    
 
     // Method to close the connection
     close() {

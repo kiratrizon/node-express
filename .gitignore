@@ -1,3 +1,4 @@
 /node_modules/
 run-server.js
 env.js
+.env
