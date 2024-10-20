@@ -2,33 +2,37 @@ const bcrypt = require('bcryptjs');
 const service = require('../Service/AppServiceProvider');
 
 class Auth {
-    #authenticated = false;
-    #userId = null;
+    authenticated = false;
+    userId = null;
     useType;
-    constructor(usertype = 'user') {
+    model;
+    constructor() {
+    }
+
+    setUser(type) {
         if (!type || !(type in service)) {
             throw new Error(`Please register ${type} first in libs/Service/AppServiceProvider.js`);
         }
-        this.useType = usertype;
+        this.useType = type;
+        this.model = service[type];
     }
-
     async attempt(params = {}) {
         let newParams = {
             conditions: {
             }
         };
         if (params.email && 'email' in params) {
-            newParams.conditions.email = params.email;
+            newParams.conditions.email = ['=', params.email];
         } else {
-            newParams.conditions.username = params.username;
+            newParams.conditions.username = ['=', params.username];
         }
-        let user = await service[this.useType].find('first', params);
+        let user = await this.model.find('first', newParams);
         if (!user) {
             return {error: 'User not found.', input: params, success: false};
         }
         if (user && bcrypt.compareSync(params.password, user.password)) {
-            this.#authenticated = true;
-            this.#userId = user.id;
+            this.authenticated = true;
+            this.userId = user.id;
             return {auth_data: user, success: true};
         } else {
             return {error: 'Password is incorrect.', input: params, success: false};
@@ -36,15 +40,18 @@ class Auth {
     }
 
     isAuthenticated() {
-        return this.#authenticated && !this.#userId;
+        return this.authenticated;
     }
     id() {
-        return this.#userId;
+        return this.userId;
     }
 
     logout() {
-        this.#authenticated = false;
-        this.#userId = null;
+        this.authenticated = false;
+        this.userId = null;
+    }
+    user() {
+        return this.model.find('first', {conditions: {id: this.userId}});
     }
 }
 

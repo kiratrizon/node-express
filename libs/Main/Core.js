@@ -12,6 +12,7 @@ class Core {
     async find(type, options) {
         let sql = `SELECT `;
         const conditions = options.conditions || {};
+        // console.log(conditions);
         const joins = options.joins || [];
         let fields = options.fields || [];
         const group = options.group || [];

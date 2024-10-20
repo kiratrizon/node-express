@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const Admin = require('../../../libs/Model/Admin');
+const Validator = require('../../../libs/Middleware/Validator');
 
 class AdminApi {
   constructor() {
@@ -14,22 +15,35 @@ class AdminApi {
   }
 
   async createAdmin(req, res) {
-    const data = {
-      username: req.body.username,
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 10),
+    const data = req.body;
+    let rules = {
+      username: 'required',
+      email: 'required|email|unique:admins',
+      password: 'required|min:6|confirmed',
     };
-
-    try {
-      const id = await this.adminModel.create(data);
-      if (id) {
-        res.status(201).json({ message: 'Admin created successfully.', id: id });
-      } else {
-        res.status(400).json({ message: 'Admin not created.' });
-      }
-    } catch (e) {
-      res.status(500).json({ message: e.message });
+    let validate = new Validator(data, rules);
+    const ruleKeys = Object.keys(rules);
+    let newData = {};
+    for (const key of ruleKeys) {
+      newData[key] = data[key];
     }
+    console.log(validate);
+
+    if (validate.fails()) {
+      res.status(400).json({ message: validate.fails(), inputOld: data });
+    } else {
+      try {
+        const id = await this.adminModel.create(newData);
+        if (id) {
+          res.status(201).json({ message: 'Admin created successfully.', id: id });
+        } else {
+          res.status(400).json({ message: 'Admin not created.' });
+        }
+      } catch (e) {
+        res.status(500).json({ message: e.message });
+      }
+    }
+
   }
 
   getRouter() {
