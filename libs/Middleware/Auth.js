@@ -6,7 +6,10 @@ class Auth {
     userId = null;
     useType;
     model;
-    constructor() {
+    constructor(type) {
+        if (type && type !== null) {
+            this.setUser(type);
+        }
     }
 
     setUser(type) {

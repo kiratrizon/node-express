@@ -1,12 +1,11 @@
 const Controller = require('../Controller');
-const Auth = require('../../../libs/Middleware/Auth');
+const Auth = require('../../../libs/Middleware/Auth2');
 
 class LoginController extends Controller {
   constructor() {
     super();
-    this.auth = new Auth();
+    this.auth = Auth;
     this.initializeRoutes();
-    this.auth.setUser(this.user);
   }
 
   initializeRoutes() {
@@ -18,17 +17,16 @@ class LoginController extends Controller {
   getLogin(req, res) {
     res.json({ message: 'this is Admin' });
   }
-  async postLogin(req, res) {
-    let params = req.body;
-    let data = await this.auth.attempt(params);
-    if (data.success) {
-      req.session.auth[this.user].isAuthenticated = this.auth.isAuthenticated();
-      req.session.auth[this.user].id = this.auth.id();
-      res.status(201).json({ message: 'Login successfully.', data: data.auth_data });
-    } else {
-      res.status(403).json(data);
+  async postLogin(req, res, next) {
+    try {
+        // Call the attempt middleware
+        await this.auth.guard(this.user).attempt()(req, res, next);
+    } catch (error) {
+        // Handle any errors that occurred in the middleware
+        console.error('Login error:', error);
+        return res.status(500).json({ error: 'Internal server error.' });
     }
-  }
+}
 
   getRouter() {
     return this.router;
