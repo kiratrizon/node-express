@@ -10,6 +10,7 @@ class LoginController extends Controller {
   }
 
   initializeRoutes() {
+    this.use('guest');
     this.router.get('/', this.getLogin.bind(this));
     this.router.post('/', this.postLogin.bind(this));
   }

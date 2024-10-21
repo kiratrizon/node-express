@@ -82,9 +82,9 @@ function makeMigration(tableName) {
 }
 
 // Function to create a controller from a stub
-function createController(controllerName, specificArea, subCommand) {
+function createController(controllerName, specificArea) {
     const controllerStubPath = path.join(__dirname, 'stubs', 'controller.stub');
-    const controllerDir = path.join(__dirname, 'app', specificArea, `${subCommand === 'guestcontroller' ? 'Guest' : ''}Controller`);
+    const controllerDir = path.join(__dirname, 'app', specificArea, `Controller`);
     const controllerPath = path.join(controllerDir, `${controllerName.toLowerCase()}.js`);
 
     // Ensure the specific area directory exists
@@ -128,8 +128,8 @@ if (command === 'make' && subCommand === 'model') {
     createModel(name);
 } else if (command === 'make' && subCommand === 'migration') {
     makeMigration(name);
-} else if (command === 'make' && (subCommand === 'controller' || subCommand === 'guestcontroller') && specificArea) {
-    createController(name, specificArea, subCommand);
+} else if (command === 'make' && subCommand === 'controller' && specificArea) {
+    createController(name, specificArea);
 } else {
     console.error("Invalid command. Use 'make model <ClassName>', 'make migration <tableName>', or 'make controller <ControllerName> <SpecificArea>'.");
     process.exit(1);

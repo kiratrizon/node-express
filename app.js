@@ -14,10 +14,11 @@ app.use(session({
     cookie: { secure: false,  }
 }));
 
-function isEmptyObject(obj) {
-    return obj !== null && typeof obj === 'object' && Object.keys(obj).length === 0 && obj.constructor === Object;
-}
+app.set('view engine', 'ejs');
 
+app.use(express.json());
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
     if (!req.session['auth']) {
@@ -43,40 +44,16 @@ app.use((req, res, next) => {
 
 
 app.use((req, res, next) => {
-    // req.session.auth.admin.isAuthenticated = false;
-    // req.session.auth.admin.id = null;
+    // req.session.auth.admin.isAuthenticated = true;
+    // req.session.auth.admin.id = 1;
     // req.session.auth.user.isAuthenticated = false;
     // req.session.auth.user.id = null;
     next();
 });
 
-app.set('view engine', 'ejs');
-
-app.use(express.json());
-
-const [adminRouter, adminGuest] = require('./app/Admin/Route/router');
-// const [userRouter, userGuest] = require('./app/User/Route/router');
+const adminRouter = require('./app/Admin/Route/router');
+const userRouter = require('./app/User/Route/router');
 const apiRouter = require('./app/Api/Route/router');
-
-function ensureAuthenticated(role = 'user') {
-    return (req, res, next) => {
-        if (req.session.auth[role].isAuthenticated) {
-            return next();
-        }
-        let path = role === 'user' ? '' : `/${role}`;
-        return res.redirect(`${path}/login`);
-    };
-}
-
-// Guest authentication middleware
-function guestAuth(role = 'user') {
-    return (req, res, next) => {
-        if (!req.session.auth[role].isAuthenticated) {
-            return next();
-        }
-        return res.redirect(`/${role}/dashboard`);
-    };
-}
 
 app.use((req, res, next) => {
     if (req.path.startsWith('/admin')) {
@@ -87,11 +64,35 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/admin', guestAuth('admin'), adminGuest);
-app.use('/admin', ensureAuthenticated('admin'), adminRouter);
+app.use(userRouter);
 
-// app.use('/', ensureAuthenticated('user'), userRouter);
-// app.use('/', guestAuth('user'), userGuest);
+
+function ensureAuthenticated(role = 'user') {
+    return (req, res, next) => {
+        if (req.session.auth[role].isAuthenticated) {
+            next();
+            return;
+        }
+        let path = role === 'user' ? '' : `/${role}`;
+        res.redirect(`/guest-${role}/login`);
+    };
+}
+
+function guestAuth(role = 'user') {
+    return (req, res, next) => {
+        if (!req.session.auth[role].isAuthenticated) {
+            next();
+            return;
+        }
+        let path = role === 'user' ? '' : `/${role}`;
+        res.redirect(`${path}/dashboard`);
+    };
+}
+
+app.use('/admin', adminRouter);
+// app.use('/guest-admin', guestAuth('admin'), adminGuest);
+
+app.use('/user', userRouter);
 
 app.use('/api', apiRouter);
 

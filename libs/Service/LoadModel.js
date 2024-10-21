@@ -1,12 +1,11 @@
 class LoadModel {
     constructor() {
-        this.model = null;
     }
 
     init(model){
         const Model = require(`../Model/${model}`);
-        this.model = new Model();
-        return this.model;
+        returnModel = new Model();
+        return returnModel;
     }
 }
 
