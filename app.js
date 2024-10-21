@@ -4,9 +4,11 @@ const session = require('express-session');
 const app = express();
 const DatabaseConnection = require('./database/database');
 const db = new DatabaseConnection();
+const loadModel = require('./libs/Service/LoadModel');
+require('dotenv').config();
 
 app.use(session({
-    secret: process.env.MAIN_KEY,
+    secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false,  }
@@ -53,7 +55,7 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 
 const [adminRouter, adminGuest] = require('./app/Admin/Route/router');
-const [userRouter, userGuest] = require('./app/User/Route/router');
+// const [userRouter, userGuest] = require('./app/User/Route/router');
 const apiRouter = require('./app/Api/Route/router');
 
 function ensureAuthenticated(role = 'user') {

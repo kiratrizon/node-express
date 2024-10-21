@@ -5,6 +5,10 @@ class Admin extends Model {
         super('admins');
         this.setAlias(this.constructor.name);
     }
+
+    helloWorld() {
+        console.log('Hello World');
+    }
 }
 
 module.exports = Admin;
