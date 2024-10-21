@@ -5,6 +5,7 @@ class {{ classname }} extends Model {
         super('{{ lowercasePluralizedClassname }}');
         this.setAlias(this.constructor.name);
     }
+    fillable = [];
 }
 
 module.exports = {{ classname }};

@@ -8,40 +8,40 @@ const validRules = [
 ];
 
 const axios = require('axios');
-
+const DatabaseConnection = require('../../database/database');
 class Validator {
     params;
     data;
     errors;
     validRules;
-
+    uniques = [];
     constructor(data = {}, params = {}) {
         this.params = params;
         this.data = data;
         this.errors = {};
         this.validRules = validRules;
+        this.database = new DatabaseConnection();
         this.handle();
     }
 
     handle() {
-        let uniqueKeys = [];
         let keysToValidate = Object.keys(this.params);
         for (const key of keysToValidate) {
             let rules = this.params[key].split('|');
             for (const rule of rules) {
                 let [ruleName, ruleValue] = rule.split(':');
                 if (ruleName === 'unique') {
-                    uniqueKeys.push({ key, table: ruleValue });
+                    this.uniques.push({ key, table: ruleValue });
                 } else {
                     // Perform validation for other rules
                     const isValid = this.validate(key, ruleName, ruleValue);
                     if (!isValid) {
-                        return; // Exit if any validation fails
+                        return;
                     }
                 }
             }
         }
-        this.handleUniqueValidations(uniqueKeys);
+        // this.handleUniqueValidations(uniqueKeys);
     }
 
     async handleUniqueValidations(uniqueKeys) {
@@ -106,26 +106,17 @@ class Validator {
         return emailRegex.test(value);
     }
     async validateUnique(email, table, key) {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/check-unique/${key}?email=${email}&table=${table}&key=${key}`);
-            return response.data.isUnique;
-        } catch (error) {
-            console.error('API error:', error);
-            return false; // or handle the error as needed
-        }
+        let sql = `SELECT ${key} FROM ${table} WHERE ${key} = ?`;
+        let data = await this.database.runQuery(sql, [email]);
+        return data.length === 0;
     }
     async fails() {
-        await Promise.all(Object.keys(this.errors).map(async (key) => {
-            // Assuming you're checking uniqueness here
-            if (this.errors[key] === 'unique') {
-                const isUnique = await this.validateUnique(this.data[key], 'admins', key);
-                if (!isUnique) {
-                    this.errors[key] = `The ${key} must be unique.`;
-                }
-            }
-        }));
-        
-        return Object.keys(this.errors).length > 0 ? this.errors : false;
+        let returnData = (Object.keys(this.errors).length > 0 ? this.errors : false);
+        if (this.uniques.length === 0){
+            return returnData;
+        }
+        await this.handleUniqueValidations(this.uniques);
+        return await (Object.keys(this.errors).length > 0 ? this.errors : false);
     }
     
 

@@ -3,6 +3,8 @@ const db = new DatabaseConnection();
 const bcrypt = require('bcryptjs');
 
 class Core {
+    fillable = [];
+    timestamps = true;
     constructor(tableName) {
         this.tableName = tableName;
         this.debug = db.debugger;
@@ -217,12 +219,22 @@ class Core {
     }
 
     async create(data = {}) {
-        data.created_at = new Date().toISOString();
-        data.updated_at = new Date().toISOString();
-
         try {
-            let result = await this.insert(data);
-            console.log(result);
+            let keys = Object.keys(data);
+            let newData = {};
+            for (const key of keys) {
+                if (this.fillable.includes(key)){
+                    newData[key] = data[key];
+                }
+            }
+            if (Object.keys(newData).length === 0) {
+                throw new Error('No fillable data provided.');
+            }
+            if (this.timestamps) {
+                newData.created_at = new Date().toISOString();
+                newData.updated_at = new Date().toISOString();
+            }
+            let result = await this.insert(newData);
             if (result){
                 return result.lastID;
             } else {

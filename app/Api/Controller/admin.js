@@ -17,7 +17,7 @@ class AdminApi {
   async createAdmin(req, res) {
     const data = req.body;
     let rules = {
-      username: 'required',
+      username: 'required|unique:admins',
       email: 'required|email|unique:admins',
       password: 'required|min:6|confirmed',
     };
@@ -27,13 +27,12 @@ class AdminApi {
     for (const key of ruleKeys) {
       newData[key] = data[key];
     }
-    console.log(validate);
-
-    if (validate.fails()) {
-      res.status(400).json({ message: validate.fails(), inputOld: data });
+    let fails = await validate.fails();
+    if (fails) {
+      res.status(400).json({ message: fails, inputOld: data });
     } else {
       try {
-        const id = await this.adminModel.create(newData);
+        const id = await this.adminModel.create(data);
         if (id) {
           res.status(201).json({ message: 'Admin created successfully.', id: id });
         } else {

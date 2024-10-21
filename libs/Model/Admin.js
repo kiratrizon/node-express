@@ -5,10 +5,11 @@ class Admin extends Model {
         super('admins');
         this.setAlias(this.constructor.name);
     }
-
-    helloWorld() {
-        console.log('Hello World');
-    }
+    fillable = [
+        'username',
+        'email',
+        'password',
+    ];
 }
 
 module.exports = Admin;
