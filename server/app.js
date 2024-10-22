@@ -3,8 +3,6 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const app = express();
-const DatabaseConnection = require('../database/database');
-const db = new DatabaseConnection();
 const adminRouter = require('../app/Admin/Route/router');
 const userRouter = require('../app/User/Route/router');
 const apiRouter = require('../app/Api/Route/router');
@@ -42,7 +40,6 @@ app.use((req, res, next) => {
         };
     }
 
-    req.db = db;
     next();
 });
 

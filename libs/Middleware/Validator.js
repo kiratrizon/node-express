@@ -20,7 +20,7 @@ class Validator {
         this.data = data;
         this.errors = {};
         this.validRules = validRules;
-        this.database = new DatabaseConnection();
+        this.database = DatabaseConnection;
         this.handle();
     }
 

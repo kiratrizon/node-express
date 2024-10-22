@@ -1,5 +1,4 @@
 const DatabaseConnection = require('../../database/database');
-const db = new DatabaseConnection();
 
 class Migrator {
 
@@ -10,7 +9,7 @@ class Migrator {
     migrate(){
         this.sql.forEach((sql) => {
             try {
-                db.runQuery(sql);
+                DatabaseConnection.runQuery(sql);
                 console.log("Migration executed successfully.");
             } catch (error) {
                 console.error("Error executing migration:", error);

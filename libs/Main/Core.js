@@ -1,13 +1,11 @@
 const DatabaseConnection = require('../../database/database');
-const db = new DatabaseConnection();
-const bcrypt = require('bcryptjs');
 
 class Core {
     fillable = [];
     timestamps = true;
     constructor(tableName) {
         this.tableName = tableName;
-        this.debug = db.debugger;
+        this.debug = DatabaseConnection.debugger;
         this.values = [];
     }
 
@@ -41,7 +39,7 @@ class Core {
         }
 
         try {
-            let data = db.runQuery(sql, this.values);
+            let data = DatabaseConnection.runQuery(sql, this.values);
             return type === 'first' ? data[0] : data;
         } catch (error) {
             console.error("Error executing query:", error);
@@ -63,7 +61,7 @@ class Core {
         }
 
         try {
-            let data = db.runQuery(sql, this.values)[0];
+            let data = DatabaseConnection.runQuery(sql, this.values)[0];
             return data;
         } catch (error) {
             console.error("Error executing query:", error);
@@ -279,7 +277,7 @@ class Core {
         const values = Object.values(data);
     
         try {
-            const result = db.runQuery(sql, values);
+            const result = DatabaseConnection.runQuery(sql, values);
             return result;
         } catch (error) {
             throw new Error(`Error inserting data: ${error.message}`);
