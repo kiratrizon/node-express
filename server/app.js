@@ -2,9 +2,9 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const app = express();
-const DatabaseConnection = require('./database/database');
+const DatabaseConnection = require('../database/database');
 const db = new DatabaseConnection();
-const loadModel = require('./libs/Service/LoadModel');
+const loadModel = require('../libs/Service/LoadModel');
 require('dotenv').config();
 
 app.use(session({
@@ -18,7 +18,7 @@ app.set('view engine', 'ejs');
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use((req, res, next) => {
     if (!req.session['auth']) {
@@ -51,21 +51,20 @@ app.use((req, res, next) => {
     next();
 });
 
-const adminRouter = require('./app/Admin/Route/router');
-const userRouter = require('./app/User/Route/router');
-const apiRouter = require('./app/Api/Route/router');
+const adminRouter = require('../app/Admin/Route/router');
+const userRouter = require('../app/User/Route/router');
+const apiRouter = require('../app/Api/Route/router');
 
 app.use((req, res, next) => {
     if (req.path.startsWith('/admin')) {
-        app.set('views', path.join(__dirname, 'app', 'Admin', 'View'));
+        app.set('views', path.join(__dirname, '..', 'app', 'Admin', 'View'));
     } else if (!req.path.startsWith('/api')) {
-        app.set('views', path.join(__dirname, 'app', 'User', 'View'));
+        app.set('views', path.join(__dirname, '..', 'app', 'User', 'View'));
     }
     next();
 });
 
 app.use(userRouter);
-
 
 function ensureAuthenticated(role = 'user') {
     return (req, res, next) => {
@@ -90,7 +89,6 @@ function guestAuth(role = 'user') {
 }
 
 app.use('/admin', adminRouter);
-// app.use('/guest-admin', guestAuth('admin'), adminGuest);
 
 app.use('/user', userRouter);
 
