@@ -20,8 +20,8 @@ const constant = {
             table: 'users',
         },
         admins: {
-            driver: 'database',
-            table: 'admins',
+            driver: 'model',
+            model: new Admin(),
         }
     }
 };
