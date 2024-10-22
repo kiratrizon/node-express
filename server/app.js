@@ -22,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// your session here
 app.use((req, res, next) => {
     if (!req.session['auth']) {
         req.session['auth'] = {};
@@ -62,28 +63,6 @@ app.use((req, res, next) => {
 });
 
 app.use(userRouter);
-
-function ensureAuthenticated(role = 'user') {
-    return (req, res, next) => {
-        if (req.session.auth[role].isAuthenticated) {
-            next();
-            return;
-        }
-        let path = role === 'user' ? '' : `/${role}`;
-        res.redirect(`/guest-${role}/login`);
-    };
-}
-
-function guestAuth(role = 'user') {
-    return (req, res, next) => {
-        if (!req.session.auth[role].isAuthenticated) {
-            next();
-            return;
-        }
-        let path = role === 'user' ? '' : `/${role}`;
-        res.redirect(`${path}/dashboard`);
-    };
-}
 
 app.use('/admin', adminRouter);
 
