@@ -15,7 +15,7 @@ class AdminApi {
   }
 
   createAdmin(req, res) {
-    const data = req.body;
+    let data = req.body;
     let rules = {
       username: 'required|unique:admins',
       email: 'required|email|unique:admins',
@@ -25,14 +25,18 @@ class AdminApi {
     const ruleKeys = Object.keys(rules);
     let newData = {};
     for (const key of ruleKeys) {
-      newData[key] = data[key];
+      if (key === 'password') {
+        newData[key] = bcrypt.hashSync(data[key], 10);
+      } else {
+        newData[key] = data[key];
+      }
     }
     let fails = validate.fails();
     if (fails) {
       res.status(400).json({ message: fails, inputOld: data });
     } else {
       try {
-        const id = this.adminModel.create(data);
+        const id = this.adminModel.create(newData);
         if (id) {
           res.status(201).json({ message: 'Admin created successfully.', id: id });
         } else {

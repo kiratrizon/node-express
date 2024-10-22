@@ -9,7 +9,6 @@ class Model extends Core {
     }
 
     find(type = 'all', options) {
-        console.log(options);
         return super.find(type, options);
     }
 

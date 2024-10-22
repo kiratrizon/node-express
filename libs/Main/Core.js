@@ -14,7 +14,6 @@ class Core {
     find(type, options) {
         let sql = `SELECT `;
         const conditions = options.conditions || {};
-        // console.log(conditions);
         const joins = options.joins || [];
         let fields = options.fields || [];
         const group = options.group || [];
@@ -52,6 +51,27 @@ class Core {
         }
     }
 
+    attemptFind(type, options){
+        let sql = `SELECT `;
+        const conditions = options.conditions || {};
+        const builtConditions = this.buildConditions(conditions);
+        this.values.push(...builtConditions.values);
+        sql += `* FROM ${this.tableName} ${builtConditions.sql} LIMIT 1`.trim()+";";
+        if (this.debug) {
+            console.log("SQL Query:", sql);
+            console.log("Query Values:", this.values);
+        }
+
+        try {
+            let data = db.runQuery(sql, this.values)[0];
+            return data;
+        } catch (error) {
+            console.error("Error executing query:", error);
+            throw error;
+        } finally {
+            this.values = [];
+        }
+    }
     count(params = {}) {
         try {
             let data = this.find('count', params);

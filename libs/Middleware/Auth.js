@@ -1,61 +1,45 @@
 const bcrypt = require('bcryptjs');
-const service = require('../Service/AppServiceProvider');
-
-class Auth {
-    authenticated = false;
-    userId = null;
-    useType;
-    model;
+const Configure = require('../Service/Configure');
+const BaseAuth = require('../Base/BaseAuth');
+class Auth extends BaseAuth {
     constructor(type) {
+        super();
         if (type && type !== null) {
-            this.setUser(type);
+            this.guard(type);
         }
     }
 
-    setUser(type) {
-        if (!type || !(type in service)) {
-            throw new Error(`Please register ${type} first in libs/Service/AppServiceProvider.js`);
+    guard(type) {
+        if (type && !(type in Configure.read('auth.guards'))){
+            throw new Error(`Please register ${type} first in config/auth.js in guards`);
         }
         this.useType = type;
-        this.model = service[type];
+        this.typeQuery = Configure.read('auth.providers')[Configure.read('auth.guards')[type].provider];
+        return this;
     }
-    attempt(params = {}) {
-        let newParams = {
-            conditions: {
-            }
+    attempt(req, key = ''){
+        if (key === ''){
+            throw new Error('Column of model/database is required');
+        }
+        let data = {};
+        data['conditions'] = {
+            [key]: ['=', req.body[key]]
         };
-        if (params.email && 'email' in params) {
-            newParams.conditions.email = ['=', params.email];
-        } else {
-            newParams.conditions.username = ['=', params.username];
+        let user = super.attempt('first', data);
+        if (!user){
+            return false;
         }
-        let user = this.model.find('first', newParams);
-        if (!user) {
-            return {error: 'User not found.', input: params, success: false};
+        if (bcrypt.compareSync(req.body.password, user.password)){
+            req.session.auth[this.useType].isAuthenticated = true;
+            req.session.auth[this.useType].id = user.id;
+            return true;
         }
-        if (user && bcrypt.compareSync(params.password, user.password)) {
-            this.authenticated = true;
-            this.userId = user.id;
-            return {auth_data: user, success: true};
-        } else {
-            return {error: 'Password is incorrect.', input: params, success: false};
-        }
+        return false;
     }
-
-    isAuthenticated() {
-        return this.authenticated;
-    }
-    id() {
-        return this.userId;
-    }
-
-    logout() {
-        this.authenticated = false;
-        this.userId = null;
-    }
-    user() {
-        return this.model.find('first', {conditions: {id: this.userId}});
+    logout(req){
+        req.session.auth[this.useType].isAuthenticated = false;
+        req.session.auth[this.useType].id = null;
     }
 }
 
-module.exports = Auth;
+module.exports = new Auth(Configure.read('auth.default').guard);
