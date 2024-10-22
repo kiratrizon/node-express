@@ -11,7 +11,7 @@ class Core {
         this.values = [];
     }
 
-    async find(type, options) {
+    find(type, options) {
         let sql = `SELECT `;
         const conditions = options.conditions || {};
         // console.log(conditions);
@@ -42,7 +42,7 @@ class Core {
         }
 
         try {
-            let data = await db.runQuery(sql, this.values);
+            let data = db.runQuery(sql, this.values);
             return type === 'first' ? data[0] : data;
         } catch (error) {
             console.error("Error executing query:", error);
@@ -52,9 +52,9 @@ class Core {
         }
     }
 
-    async count(params = {}) {
+    count(params = {}) {
         try {
-            let data = await this.find('count', params);
+            let data = this.find('count', params);
             this.countCache = data[0].count;
             return data[0].count;
         } catch (error) {
@@ -218,7 +218,7 @@ class Core {
         return `${limitClause} ${offsetClause}`.trim(); // Trim to avoid leading spaces
     }
 
-    async create(data = {}) {
+    create(data = {}) {
         try {
             let keys = Object.keys(data);
             let newData = {};
@@ -234,7 +234,7 @@ class Core {
                 newData.created_at = new Date().toISOString();
                 newData.updated_at = new Date().toISOString();
             }
-            let result = await this.insert(newData);
+            let result = this.insert(newData);
             if (result){
                 return result.lastID;
             } else {
@@ -246,7 +246,7 @@ class Core {
         }
     }
 
-    async insert(data = {}) {
+    insert(data = {}) {
         if (!data || Object.keys(data).length === 0) {
             throw new Error('No data provided for insertion.');
         }
@@ -259,7 +259,7 @@ class Core {
         const values = Object.values(data);
     
         try {
-            const result = await db.runQuery(sql, values);
+            const result = db.runQuery(sql, values);
             return result;
         } catch (error) {
             throw new Error(`Error inserting data: ${error.message}`);

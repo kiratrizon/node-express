@@ -8,9 +8,9 @@ class Migrator {
     }
 
     migrate(){
-        this.sql.forEach(async (sql) => {
+        this.sql.forEach((sql) => {
             try {
-                await db.runQuery(sql);
+                db.runQuery(sql);
                 console.log("Migration executed successfully.");
             } catch (error) {
                 console.error("Error executing migration:", error);

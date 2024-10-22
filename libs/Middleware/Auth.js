@@ -19,7 +19,7 @@ class Auth {
         this.useType = type;
         this.model = service[type];
     }
-    async attempt(params = {}) {
+    attempt(params = {}) {
         let newParams = {
             conditions: {
             }
@@ -29,7 +29,7 @@ class Auth {
         } else {
             newParams.conditions.username = ['=', params.username];
         }
-        let user = await this.model.find('first', newParams);
+        let user = this.model.find('first', newParams);
         if (!user) {
             return {error: 'User not found.', input: params, success: false};
         }

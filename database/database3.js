@@ -1,4 +1,4 @@
-const sqlite3 = require('better-sqlite3');
+const sqlite3 = require('sqlite3').verbose();
 const mysql = require('mysql2');
 const config = require('../env'); // Import the configuration
 
@@ -16,12 +16,13 @@ class DatabaseConnection {
                 }
             });
         } else if (this.databaseType === 'sqlite') {
-            try {
-                this.connection = new sqlite3(config.config.sqlite.file);
-                // console.log('Connected to SQLite database.');
-            } catch (err) {
-                // console.error('Error connecting to SQLite database:', err.message);
-            }
+            this.connection = new sqlite3.Database(config.config.sqlite.file, (err) => {
+                if (err) {
+                    // console.error('Error connecting to SQLite database:', err.message);
+                } else {
+                    // console.log('Connected to SQLite database.');
+                }
+            });
         } else {
             throw new Error('Unsupported database type');
         }
@@ -29,29 +30,36 @@ class DatabaseConnection {
 
     // Method to run a query (for SQLite and MySQL)
     runQuery(query, params = []) {
-        if (this.databaseType === 'mysql') {
-            return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
+            if (this.databaseType === 'mysql') {
                 this.connection.query(query, params, (err, results) => {
                     if (err) {
                         return reject(err);
                     }
                     resolve(results); // For SELECT, returns the result set
                 });
-            });
-        } else if (this.databaseType === 'sqlite') {
-            try {
+            } else if (this.databaseType === 'sqlite') {
+                // Check if the query starts with SELECT
                 if (query.trim().toLowerCase().startsWith('select')) {
-                    return this.connection.prepare(query).all(...params); // For SELECT
+                    this.connection.all(query, params, (err, rows) => { // For SELECT
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve(rows); // Return the rows fetched from the SELECT query
+                    });
                 } else {
-                    const stmt = this.connection.prepare(query);
-                    const info = stmt.run(...params); // For INSERT, UPDATE, DELETE
-                    return { changes: info.changes, lastID: info.lastInsertRowid }; // Return changes and last ID
+                    // For INSERT, UPDATE, DELETE
+                    this.connection.run(query, params, function (err) {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve({ changes: this.changes, lastID: this.lastID }); // Return changes and last ID
+                    });
                 }
-            } catch (err) {
-                throw new Error(`SQLite query error: ${err.message}`);
             }
-        }
+        });
     }
+    
 
     // Method to close the connection
     close() {
@@ -64,12 +72,13 @@ class DatabaseConnection {
                 }
             });
         } else if (this.databaseType === 'sqlite') {
-            try {
-                this.connection.close();
-                console.log('SQLite connection closed.');
-            } catch (err) {
-                console.error('Error closing SQLite database:', err.message);
-            }
+            this.connection.close((err) => {
+                if (err) {
+                    console.error('Error closing SQLite database:', err.message);
+                } else {
+                    console.log('SQLite connection closed.');
+                }
+            });
         }
     }
 

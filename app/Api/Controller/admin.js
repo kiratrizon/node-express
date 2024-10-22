@@ -14,7 +14,7 @@ class AdminApi {
     this.router.post('/create', this.createAdmin.bind(this));
   }
 
-  async createAdmin(req, res) {
+  createAdmin(req, res) {
     const data = req.body;
     let rules = {
       username: 'required|unique:admins',
@@ -27,12 +27,12 @@ class AdminApi {
     for (const key of ruleKeys) {
       newData[key] = data[key];
     }
-    let fails = await validate.fails();
+    let fails = validate.fails();
     if (fails) {
       res.status(400).json({ message: fails, inputOld: data });
     } else {
       try {
-        const id = await this.adminModel.create(data);
+        const id = this.adminModel.create(data);
         if (id) {
           res.status(201).json({ message: 'Admin created successfully.', id: id });
         } else {

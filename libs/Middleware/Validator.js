@@ -30,30 +30,15 @@ class Validator {
             let rules = this.params[key].split('|');
             for (const rule of rules) {
                 let [ruleName, ruleValue] = rule.split(':');
-                if (ruleName === 'unique') {
-                    this.uniques.push({ key, table: ruleValue });
-                } else {
-                    // Perform validation for other rules
-                    const isValid = this.validate(key, ruleName, ruleValue);
-                    if (!isValid) {
-                        return;
-                    }
+                const isValid = this.validate(key, ruleName, ruleValue);
+                if (!isValid) {
+                    break;
                 }
             }
         }
-        // this.handleUniqueValidations(uniqueKeys);
     }
 
-    async handleUniqueValidations(uniqueKeys) {
-        for (const { key, table } of uniqueKeys) {
-            const isUnique = await this.validateUnique(this.data[key], table, key);
-            if (!isUnique) {
-                this.errors[key] = `The ${key} must be unique.`;
-            }
-        }
-    }
-
-    async validate(key, ruleName, ruleValue = undefined) {
+    validate(key, ruleName, ruleValue = undefined) {
         let returnData = true;
 
         switch (ruleName) {
@@ -82,7 +67,7 @@ class Validator {
                 }
                 break;
             case 'unique':
-                const isUnique = await this.validateUnique(this.data[key], ruleValue, key);
+                const isUnique = this.validateUnique(this.data[key], ruleValue, key);
                 if (!isUnique) {
                     this.errors[key] = `The ${key} must be unique`;
                     returnData = false;
@@ -105,18 +90,18 @@ class Validator {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(value);
     }
-    async validateUnique(email, table, key) {
+    validateUnique(email, table, key) {
         let sql = `SELECT ${key} FROM ${table} WHERE ${key} = ?`;
-        let data = await this.database.runQuery(sql, [email]);
+        let data = this.database.runQuery(sql, [email]);
         return data.length === 0;
     }
-    async fails() {
+    fails() {
         let returnData = (Object.keys(this.errors).length > 0 ? this.errors : false);
         if (this.uniques.length === 0){
             return returnData;
         }
-        await this.handleUniqueValidations(this.uniques);
-        return await (Object.keys(this.errors).length > 0 ? this.errors : false);
+     this.handleUniqueValidations(this.uniques);
+        return (Object.keys(this.errors).length > 0 ? this.errors : false);
     }
     
 

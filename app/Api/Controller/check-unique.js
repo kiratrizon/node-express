@@ -10,11 +10,11 @@ class CheckUniqueController extends Controller {
     this.router.get('/email', this.getCheckUniqueEmail.bind(this));
   }
 
-  async getCheckUniqueEmail(req, res) {
+  getCheckUniqueEmail(req, res) {
     let get = req.query;
     
     try {
-      let data = await req.db.runQuery(`SELECT ${get['key']} from ${get['table']} where ${get['key']} = ?`, [get['email']]);
+      let data = req.db.runQuery(`SELECT ${get['key']} from ${get['table']} where ${get['key']} = ?`, [get['email']]);
       if (data){
         res.json({ isUnique: false })
       } else {

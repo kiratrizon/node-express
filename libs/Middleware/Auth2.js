@@ -15,7 +15,7 @@ class Auth {
     }
 
     attempt(){
-        return async (req, res, next) => {
+        return (req, res, next) => {
             let newParams = {
                 conditions: {
                 }
@@ -26,7 +26,7 @@ class Auth {
             } else {
                 newParams.conditions.username = ['=', params.username];
             }
-            let user = await this.modelUsed.find('first', newParams);
+            let user = this.modelUsed.find('first', newParams);
             if (!user) {
                 res.status(403).json('hello world');
             }

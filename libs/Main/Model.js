@@ -8,9 +8,9 @@ class Model extends Core {
         super.setAlias(alias);
     }
 
-    async find(type = 'all', options) {
+    find(type = 'all', options) {
         console.log(options);
-        return await super.find(type, options);
+        return super.find(type, options);
     }
 
 }

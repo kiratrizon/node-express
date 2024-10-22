@@ -17,10 +17,10 @@ class LoginController extends Controller {
   getLogin(req, res) {
     res.json({ message: 'this is Admin' });
   }
-  async postLogin(req, res, next) {
+  postLogin(req, res, next) {
     try {
         // Call the attempt middleware
-        await this.auth.guard(this.user).attempt()(req, res, next);
+        this.auth.guard(this.user).attempt()(req, res, next);
     } catch (error) {
         // Handle any errors that occurred in the middleware
         console.error('Login error:', error);
