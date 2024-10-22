@@ -1,11 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const app = express();
 const DatabaseConnection = require('../database/database');
 const db = new DatabaseConnection();
-const loadModel = require('../libs/Service/LoadModel');
-require('dotenv').config();
+const adminRouter = require('../app/Admin/Route/router');
+const userRouter = require('../app/User/Route/router');
+const apiRouter = require('../app/Api/Route/router');
+const Configure = require('../libs/Service/Configure');
 
 app.use(session({
     secret: process.env.MAIN_KEY || 'test-secret',
@@ -50,10 +53,6 @@ app.use((req, res, next) => {
     // req.session.auth.user.id = null;
     next();
 });
-
-const adminRouter = require('../app/Admin/Route/router');
-const userRouter = require('../app/User/Route/router');
-const apiRouter = require('../app/Api/Route/router');
 
 app.use((req, res, next) => {
     if (req.path.startsWith('/admin')) {

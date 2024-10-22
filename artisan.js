@@ -112,17 +112,36 @@ function createController(controllerName, specificArea) {
     });
 }
 
-// Command line argument handling
+function createConfig(name) {
+    const stubPath = path.join(__dirname, 'stubs', 'constant.stub');
+    const destinationPath = path.join(__dirname, 'config', `${name}.js`);
+
+    fs.mkdir(path.dirname(destinationPath), { recursive: true }, (err) => {
+        if (err) {
+            console.error(`Error creating directory: ${err.message}`);
+            return;
+        }
+
+        fs.copyFile(stubPath, destinationPath, (err) => {
+            if (err) {
+                console.error(`Error creating config file: ${err.message}`);
+            } else {
+                console.log(`Config file created at config/${name}.js`);
+            }
+        });
+    });
+}
+
 const args = process.argv.slice(2);
 if (args.length < 3) {
     console.error("Please provide a command (make model, make migration, or make controller) and a name.");
     process.exit(1);
 }
 
-const command = args[0]; // "make"
-const subCommand = args[1]; // "model", "migration", or "controller"
-const name = args[2]; // ClassName or tableName or ControllerName
-const specificArea = args[3]; // Specific area for controller
+const command = args[0];
+const subCommand = args[1]; 
+const name = args[2];
+const specificArea = args[3];
 
 if (command === 'make' && subCommand === 'model') {
     createModel(name);
@@ -130,6 +149,8 @@ if (command === 'make' && subCommand === 'model') {
     makeMigration(name);
 } else if (command === 'make' && subCommand === 'controller' && specificArea) {
     createController(name, specificArea);
+} else if (command === 'make' && subCommand === 'config') {
+    createConfig(name);
 } else {
     console.error("Invalid command. Use 'make model <ClassName>', 'make migration <tableName>', or 'make controller <ControllerName> <SpecificArea>'.");
     process.exit(1);
