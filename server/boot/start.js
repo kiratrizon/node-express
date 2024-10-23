@@ -6,14 +6,13 @@ const SQLiteStore = require('connect-sqlite3')(session);
 const flash = require('connect-flash');
 const Configure = require('../../libs/Service/Configure');
 const Auth = require('../../libs/Middleware/Auth');
-const dbPath = path.join(__dirname, '..', '..', 'database', 'database.sqlite')
 
 const app = express();
 
 app.use(session({
     store: new SQLiteStore({
-        db: dbPath,
-        dir: path.dirname(dbPath)
+        db: '../../database/sessions.sqlite',
+        dir: '../../database/'
     }),
     secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
