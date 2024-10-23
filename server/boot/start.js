@@ -12,7 +12,7 @@ const app = express();
 
 app.use(session({
     store: new SQLiteStore({
-        db: path.join('..', 'database', 'sessions.sqlite'), // Absolute path
+        db: path.join(process.env.STORE), // Absolute path
         dir: path.join('database') // Directory path
     }),
     secret: process.env.MAIN_KEY || 'test-secret',
