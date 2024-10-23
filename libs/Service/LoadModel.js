@@ -4,8 +4,7 @@ class LoadModel {
 
     init(model){
         const Model = require(`../Model/${model}`);
-        returnModel = new Model();
-        return returnModel;
+        return Model;
     }
 }
 

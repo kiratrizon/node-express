@@ -1,0 +1,3 @@
+<%- include('../../../../libs/Base/Defaults/View/header') %>
+<!- Your body here ->
+<%- include('../../../../libs/Base/Defaults/View/footer') %>

@@ -3,10 +3,12 @@ const mysql = require('mysql2');
 require('dotenv').config();
 
 class DatabaseConnection {
+    debugger;
+    databaseType;
+    connection;
     constructor() {
-        // Load the configuration from environment variables
-        this.databaseType = process.env.DATABASE_TYPE; // Use .env variable
-        this.debugger = process.env.DEBUGGER; // Use .env variable
+        this.databaseType = process.env.DATABASE_TYPE;
+        this.debugger = (process.env.DEBUGGER || 'false') === 'true';
 
         if (this.databaseType === 'mysql') {
             this.connection = mysql.createConnection({

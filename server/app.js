@@ -1,26 +1,6 @@
-require('dotenv').config();
-const express = require('express');
+const app = require('./boot/start');
 const path = require('path');
-const session = require('express-session');
-const app = express();
-const adminRouter = require('../app/Admin/Route/router');
-const userRouter = require('../app/User/Route/router');
-const apiRouter = require('../app/Api/Route/router');
-const Configure = require('../libs/Service/Configure');
-
-app.use(session({
-    secret: process.env.MAIN_KEY || 'test-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false,  }
-}));
-
-app.set('view engine', 'ejs');
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use(express.static(path.join(__dirname, '..', 'public')));
+require('dotenv').config();
 
 // your session here
 app.use((req, res, next) => {
@@ -44,15 +24,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
-app.use((req, res, next) => {
-    // req.session.auth.admin.isAuthenticated = true;
-    // req.session.auth.admin.id = 1;
-    // req.session.auth.user.isAuthenticated = false;
-    // req.session.auth.user.id = null;
-    next();
-});
-
 app.use((req, res, next) => {
     if (req.path.startsWith('/admin')) {
         app.set('views', path.join(__dirname, '..', 'app', 'Admin', 'View'));
@@ -62,16 +33,21 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(userRouter);
+const adminRouter = require('../app/Admin/Route/router');
+const userRouter = require('../app/User/Route/router');
+const apiRouter = require('../app/Api/Route/router');
 
 app.use('/admin', adminRouter);
 
-app.use('/user', userRouter);
+app.use('/', userRouter);
 
 app.use('/api', apiRouter);
 
-app.get('/get-user', (req, res) => {
-    res.send(req.session.auth);
+app.get('/debug', (req, res) => {
+    if ((process.env.SESSION_DEBUG || 'false') === 'true') {
+        return res.send(req.session.auth);
+    }
+    return res.status(403).send('Debug mode is disabled.');
 });
 
 module.exports = app;

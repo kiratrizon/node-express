@@ -1,24 +1,21 @@
-const Core = require("../Main/Core");
+const Core = require("../Main/CoreClone");
 
 class BaseAuth {
-    authenticated = false;
-    userId = null;
-    useType;
-    choice;
-    queryType;
-    typeQuery = {};
-    constructor() {
-        // this.useType = type;
+    provider;
+    #forFind;
+    constructor(){
+
     }
-    attempt(type = 'first', options = {}) {
-        let user;
-        if (this.typeQuery.driver === 'database'){
-            this.queryType = new Core(this.typeQuery.table);
-            user = this.queryType.attemptFind(type, options);
-        } else {
-            user = this.typeQuery.model.find(type, options);
+
+    attempt(params){
+        let user = null;
+        if (this.provider.driver === 'database'){
+            this.#forFind = new Core(this.provider.table);
+            user = this.#forFind.find(params);
+        }else if (this.provider.driver === 'eloquent'){
+            user = this.provider.model.find('first', params);
         }
-        return !user ? null : user;
+        return user;
     }
 }
 

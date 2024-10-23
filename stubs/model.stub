@@ -8,4 +8,4 @@ class {{ classname }} extends Model {
     fillable = [];
 }
 
-module.exports = {{ classname }};
+module.exports = new {{ classname }}();

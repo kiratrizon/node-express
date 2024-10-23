@@ -85,7 +85,7 @@ function makeMigration(tableName) {
 function createController(controllerName, specificArea) {
     const controllerStubPath = path.join(__dirname, 'stubs', 'controller.stub');
     const controllerDir = path.join(__dirname, 'app', specificArea, `Controller`);
-    const controllerPath = path.join(controllerDir, `${controllerName.toLowerCase()}.js`);
+    const controllerPath = path.join(controllerDir, `${controllerName}Controller.js`);
 
     // Ensure the specific area directory exists
     if (!fs.existsSync(controllerDir)) {
@@ -132,6 +132,32 @@ function createConfig(name) {
     });
 }
 
+function makeView(folder, specific) {
+    const viewsBasePath = path.join(__dirname, 'app', specific, 'View', folder);
+    const viewPath = path.join(viewsBasePath, 'index.ejs');
+
+    // Create the directory if it doesn't exist
+    fs.mkdirSync(viewsBasePath, { recursive: true });
+
+    // Read the stub file
+    const stubFilePath = path.join(__dirname, 'stubs', 'view.stub');
+    fs.readFile(stubFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error reading the stub file:', err);
+            return;
+        }
+
+        // Write the content to the new view file
+        fs.writeFile(viewPath, data, (err) => {
+            if (err) {
+                console.error('Error creating the view file:', err);
+            } else {
+                console.log(`View file created at ${viewPath}`);
+            }
+        });
+    });
+}
+
 const args = process.argv.slice(2);
 if (args.length < 3) {
     console.error("Please provide a command (make model, make migration, or make controller) and a name.");
@@ -151,7 +177,9 @@ if (command === 'make' && subCommand === 'model') {
     createController(name, specificArea);
 } else if (command === 'make' && subCommand === 'config') {
     createConfig(name);
-} else {
+} else if (command === 'make' && subCommand === 'view') {
+    makeView(name, specificArea);
+}  else {
     console.error("Invalid command. Use 'make model <ClassName>', 'make migration <tableName>', or 'make controller <ControllerName> <SpecificArea>'.");
     process.exit(1);
 }

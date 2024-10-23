@@ -12,4 +12,4 @@ class Admin extends Model {
     ];
 }
 
-module.exports = Admin;
+module.exports = new Admin();

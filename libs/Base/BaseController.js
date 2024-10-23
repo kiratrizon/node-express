@@ -13,7 +13,7 @@ class BaseController {
                 next();
                 return;
             }
-            res.redirect(`${role === 'user' ? '' : `/${role}`}/login`);
+            return res.redirect(`${role === 'user' ? '' : `/${role}`}/login`);
         }
     }
     guest(role){
@@ -22,7 +22,7 @@ class BaseController {
                 next();
                 return;
             }
-            res.redirect(`${role === 'user' ? '' : `/${role}`}/dashboard`);
+            return res.redirect(`${role === 'user' ? '' : `/${role}`}/dashboard`);
         }
     }
     // end of auitentications

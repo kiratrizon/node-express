@@ -1,5 +1,6 @@
 const Admin = require("../libs/Model/Admin");
 
+// ensure that all keys are in lowercase
 const constant = {
     default: {
         guard: "user"
@@ -18,12 +19,16 @@ const constant = {
         users: {
             driver: 'database',
             table: 'users',
+            passed: '/dashboard',
+            failed: '/login',
         },
         admins: {
-            driver: 'model',
-            model: new Admin(),
+            driver: 'eloquent',
+            model: Admin,
+            passed: '/admin/dashboard',
+            failed: '/admin/login',
         }
-    }
+    },
 };
 
 module.exports = constant;

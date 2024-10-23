@@ -6,7 +6,7 @@ const Validator = require('../../../libs/Middleware/Validator');
 class AdminApi {
   constructor() {
     this.router = express.Router();
-    this.adminModel = new Admin();
+    this.adminModel = Admin;
     this.initializeRoutes();
   }
 
@@ -21,7 +21,7 @@ class AdminApi {
       email: 'required|email|unique:admins',
       password: 'required|min:6|confirmed',
     };
-    let validate = new Validator(data, rules);
+    let validate = Validator.make(req, rules);
     const ruleKeys = Object.keys(rules);
     let newData = {};
     for (const key of ruleKeys) {
