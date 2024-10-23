@@ -13,7 +13,7 @@ const app = express();
 app.use(session({
     store: new SQLiteStore({
         db: path.join(process.env.STORE), // Absolute path
-        dir: path.join('database') // Directory path
+        dir: path.join('tmp') // Directory path
     }),
     secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
