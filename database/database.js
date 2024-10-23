@@ -27,7 +27,7 @@ class DatabaseConnection {
             });
         } else if (this.databaseType === 'sqlite') {
             try {
-                const dbPath = process.env.SQLITE_FILE || path.join(__dirname, 'database', 'sessions.sqlite');
+                const dbPath = process.env.SQLITE_FILE;
                 this.connection = new sqlite3(dbPath);
             } catch (err) {
                 console.error('Error connecting to SQLite database:', err.message);
