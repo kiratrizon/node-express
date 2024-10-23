@@ -6,13 +6,27 @@ const SQLiteStore = require('connect-sqlite3')(session);
 const flash = require('connect-flash');
 const Configure = require('../../libs/Service/Configure');
 const Auth = require('../../libs/Middleware/Auth');
+const fs = require('fs');
 
 const app = express();
 
+const dbFilePath = 'database/sessions.sqlite';
+
+// Ensure the database directory exists
+const dbDirectory = 'database';
+if (!fs.existsSync(dbDirectory)) {
+    fs.mkdirSync(dbDirectory, { recursive: true });
+}
+
+// Create the database file if it doesn't exist
+if (!fs.existsSync(dbFilePath)) {
+    fs.writeFileSync(dbFilePath, ''); // Creates an empty file
+}
+
 app.use(session({
     store: new SQLiteStore({
-        db: '../../database/sessions.sqlite',
-        dir: '../../database/'
+        db: path.join('..', 'database', 'sessions.sqlite'), // Absolute path
+        dir: path.join('database') // Directory path
     }),
     secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
