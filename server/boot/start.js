@@ -11,14 +11,14 @@ const fs = require('fs');
 const app = express();
 
 app.use(session({
-    store: new SQLiteStore({
-        db: path.join(process.env.STORE), // Absolute path
-        dir: path.join('tmp') // Directory path
-    }),
+    // store: new SQLiteStore({
+    //     db: path.join(process.env.STORE),
+    //     dir: path.join('tmp')
+    // }),
     secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }
+    cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
 app.use(flash());
