@@ -1,6 +1,7 @@
 const sqlite3 = require('better-sqlite3');
 const mysql = require('mysql2');
 require('dotenv').config();
+const path = require('path');
 
 class DatabaseConnection {
     debugger;
@@ -26,7 +27,7 @@ class DatabaseConnection {
             });
         } else if (this.databaseType === 'sqlite') {
             try {
-                this.connection = new sqlite3(process.env.SQLITE_FILE || './database/database.sqlite'); // Use .env variable
+                this.connection = new sqlite3(process.env.SQLITE_FILE || path.join(__dirname, 'database.sqlite')); // Use .env variable
                 console.log('Connected to SQLite database.');
             } catch (err) {
                 console.error('Error connecting to SQLite database:', err.message);
