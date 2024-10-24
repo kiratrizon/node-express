@@ -2,16 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
+// const SQLiteStore = require('connect-sqlite3')(session);
 const flash = require('connect-flash');
 const Configure = require('../../libs/Service/Configure');
 const Auth = require('../../libs/Middleware/Auth');
-const fs = require('fs');
 
 const app = express();
 
 app.use(session({
-    store: new SQLiteStore(':memory:'),
+    // store: new SQLiteStore(':memory:'),
     secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
     saveUninitialized: false,
