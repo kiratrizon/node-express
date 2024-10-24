@@ -30,7 +30,7 @@ class DatabaseConnection {
                 // const dbPath = process.env.SQLITE_FILE;
                 // const dbPath = './database/database.sqlite';
                 const dbPath = path.join(__dirname, '..', 'database', 'database.sqlite');
-                this.connection = new sqlite3(dbPath);
+                this.connection = new sqlite3(':memory:');
             } catch (err) {
                 console.error('Error connecting to SQLite database:', err.message);
             }
