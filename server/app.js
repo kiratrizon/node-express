@@ -24,24 +24,26 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use((req, res, next) => {
-    if (req.path.startsWith('/admin')) {
-        app.set('views', path.join(__dirname, '..', 'app', 'Admin', 'View'));
-    } else if (!req.path.startsWith('/api')) {
-        app.set('views', path.join(__dirname, '..', 'app', 'User', 'View'));
-    }
-    next();
-});
+function view(type = 'User') {
+    return (req, res, next) => {
+        let reqPath = ucFirst(req.path.split('/')[1]);
+        app.set('views', path.join(__dirname, '..', 'app', type, 'View', reqPath));
+        next();
+    };
+}
 
+function ucFirst(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 
 const adminRouter = require('../app/Admin/Route/router');
 const userRouter = require('../app/User/Route/router');
 const apiRouter = require('../app/Api/Route/router');
 
-app.use('/admin', adminRouter);
+app.use('/admin', view('Admin'), adminRouter);
 
-app.use('/', userRouter);
+app.use('/', view(), userRouter);
 
 app.use('/api', apiRouter);
 

@@ -7,7 +7,7 @@ class ProfileController extends Controller {
   }
 
   initializeRoutes() {
-    this.use('auth');
+    // this.use('auth');
     this.router.get('/', this.getProfile.bind(this));
   }
 

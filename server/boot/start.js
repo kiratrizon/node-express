@@ -13,8 +13,7 @@ const app = express();
 
 app.use(session({
     store: new SQLiteStore({
-        db: 'sessions.sqlite',
-        dir: 'tmp',
+        db: path.join('tmp', 'database.sqlite'),
     }),
     secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
@@ -30,7 +29,7 @@ app.set('view engine', 'ejs');
 
 app.use((req, res, next) => {
     res.locals.config = (value) => Configure.read(value);
-    res.locals.auth = new Auth(req);
+    res.locals.auth = () => new Auth(req);
     req.auth = new Auth(req);
     next();
 });
