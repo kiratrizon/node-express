@@ -2,13 +2,14 @@ const express = require('express');
 
 class BaseController {
     allowedAuths = ['auth', 'guest'];
+    data = {};
     constructor() {
         this.router = express.Router();
     }
 
     // authentications
-    auth(role){
-        return (req, res, next)=>{
+    auth(role) {
+        return (req, res, next) => {
             if (req.session.auth[role].isAuthenticated) {
                 next();
                 return;
@@ -16,8 +17,8 @@ class BaseController {
             return res.redirect(`${role === 'user' ? '' : `/${role}`}/login`);
         }
     }
-    guest(role){
-        return (req, res, next)=>{
+    guest(role) {
+        return (req, res, next) => {
             if (!req.session.auth[role].isAuthenticated) {
                 next();
                 return;
@@ -26,6 +27,9 @@ class BaseController {
         }
     }
     // end of auitentications
+    set(key, value) {
+        this.data[key] = value;
+    }
 }
 
 module.exports = BaseController;

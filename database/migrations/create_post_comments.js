@@ -2,7 +2,7 @@ const Migrator = require('../../libs/Service/Migrator');
 require('dotenv').config(); // Ensure environment variables are loaded
 
 const m = new Migrator();
-const tableName = 'admins';
+const tableName = 'post_comments';
 
 // Check if database type is MySQL or SQLite
 if (process.env.DATABASE_TYPE === 'mysql') {

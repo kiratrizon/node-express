@@ -4,6 +4,7 @@ class DashboardController extends Controller {
   constructor() {
     super();
     this.initializeRoutes();
+    this.set('title', 'Dashboard');
   }
 
   initializeRoutes() {
@@ -12,7 +13,7 @@ class DashboardController extends Controller {
   }
 
   getDashboard(req, res) {
-    res.json({ message: 'this is Admin wew' });
+    res.render('index', this.data);
   }
 
   getRouter() {

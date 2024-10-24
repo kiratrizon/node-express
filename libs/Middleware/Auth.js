@@ -2,14 +2,14 @@ const bcrypt = require('bcryptjs');
 const Configure = require('../Service/Configure');
 const BaseAuth = require('../Base/BaseAuth');
 
-function ucFirst(string){
+function ucFirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 class Auth extends BaseAuth {
     #session;
     #req;
     #guardType;
-    constructor(req){
+    constructor(req) {
         super();
         this.#guarded(Configure.read('auth.default.guard'));
         this.#req = req;
@@ -21,33 +21,33 @@ class Auth extends BaseAuth {
         }
         return this;
     }
-    #guarded(type){
-        if (type &&!(type in Configure.read('auth.guards'))){
+    #guarded(type) {
+        if (type && !(type in Configure.read('auth.guards'))) {
             throw new Error(`Please register ${type} first in config/auth.js in guards`);
         }
         this.#guardType = type.toLowerCase();
         this.provider = Configure.read('auth.providers')[Configure.read(`auth.guards.${this.#guardType}.provider`)];
     }
-    attempt(data){
+    async attempt(data) {
         let keys = Object.keys(data);
-        if (!keys.includes('password')){
+        if (!keys.includes('password')) {
             throw new Error('Password field is required.');
         }
-        if (Object.keys(data).length === 2){
+        if (Object.keys(data).length === 2) {
             let key = keys[0] != 'password' ? keys[0] : keys[1];
             let queryParams = {};
             queryParams['conditions'] = {
                 [key]: ['=', data[key]]
             };
-            let user = super.attempt(queryParams);
-            if (!user){
+            let user = await super.attempt(queryParams);
+            if (!user) {
                 this.#req.flash('old', data);
                 this.#req.flash('error', {
                     [key]: ucFirst(`${key} not found.`)
                 });
                 return false;
             }
-            if (bcrypt.compareSync(data.password, user.password)){
+            if (bcrypt.compareSync(data.password, user.password)) {
                 this.#session.auth[this.#guardType].isAuthenticated = true;
                 this.#session.auth[this.#guardType].id = user.id;
                 return true;
@@ -62,22 +62,22 @@ class Auth extends BaseAuth {
         this.#req.flash('old', data);
         return false;
     }
-    redirectAuth(){
+    redirectAuth() {
         return this.provider.passed;
     }
-    redirectFail(){
+    redirectFail() {
         return this.provider.failed;
     }
-    check(){
-        return typeof this.#session.auth[this.#guardType].isAuthenticated!== 'undefined' && this.#session.auth[this.#guardType].isAuthenticated;
+    check() {
+        return typeof this.#session.auth[this.#guardType].isAuthenticated !== 'undefined' && this.#session.auth[this.#guardType].isAuthenticated;
     }
-    id(){
-        if (typeof this.#session.auth[this.#guardType].id === 'undefined' ||!this.#session.auth[this.#guardType].id){
+    id() {
+        if (typeof this.#session.auth[this.#guardType].id === 'undefined' || !this.#session.auth[this.#guardType].id) {
             return null;
         }
         return this.#session.auth[this.#guardType].id;
     }
-    logout(){
+    logout() {
         this.#session.auth[this.#guardType].isAuthenticated = false;
         this.#session.auth[this.#guardType].id = null;
     }

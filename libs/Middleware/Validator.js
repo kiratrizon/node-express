@@ -9,6 +9,7 @@ const validRules = [
 
 const axios = require('axios');
 const DatabaseConnection = require('../../database/database');
+
 class Validator {
     #req;
     params;
@@ -21,13 +22,13 @@ class Validator {
         this.#initialize();
     }
 
-    handle() {
+    async handle() {
         let keysToValidate = Object.keys(this.params);
         for (const key of keysToValidate) {
             let rules = this.params[key].split('|');
             for (const rule of rules) {
                 let [ruleName, ruleValue] = rule.split(':');
-                const isValid = this.#validate(key, ruleName, ruleValue);
+                const isValid = await this.#validate(key, ruleName, ruleValue);
                 if (!isValid) {
                     break;
                 }
@@ -41,7 +42,8 @@ class Validator {
         this.validRules = validRules;
         this.database = new DatabaseConnection();
     }
-    #validate(key, ruleName, ruleValue = undefined) {
+
+    async #validate(key, ruleName, ruleValue = undefined) {
         let returnData = true;
 
         switch (ruleName) {
@@ -70,7 +72,7 @@ class Validator {
                 }
                 break;
             case 'unique':
-                const isUnique = this.#validateUnique(this.#data[key], ruleValue, key);
+                const isUnique = await this.#validateUnique(this.#data[key], ruleValue, key);
                 if (!isUnique) {
                     this.errors[key] = `The ${key} must be unique`;
                     returnData = false;
@@ -93,11 +95,13 @@ class Validator {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(value);
     }
-    #validateUnique(email, table, key) {
+
+    async #validateUnique(value, table, key) {
         let sql = `SELECT ${key} FROM ${table} WHERE ${key} = ?`;
-        let data = this.database.runQuery(sql, [email]);
-        return data.length === 0;
+        let data = await this.database.runQuery(sql, [value]); // Await the query execution
+        return data.length === 0; // Check if no records were found
     }
+
     /**
      * Checks if there are any validation errors.
      *
@@ -105,7 +109,7 @@ class Validator {
      *                           or false if there are no errors.
      */
     fails() {
-        let returnData = (Object.keys(this.errors).length > 0) ? true : false;
+        let returnData = (Object.keys(this.errors).length > 0);
         if (returnData) {
             let returnKeys = {};
             Object.keys(this.#data).forEach(key => {
@@ -125,11 +129,11 @@ class Validator {
      * @param {Object} [params={}] - Optional parameters for validation rules.
      * @returns {void} This function does not return a value. It handles validation.
      */
-    make(data = {}, params = {}) {
+    async make(data = {}, params = {}) {
         this.#initialize();
         this.params = params;
         this.#data = data;
-        this.handle();
+        await this.handle(); // Await the handle method for asynchronous operations
         return this;
     }
 }

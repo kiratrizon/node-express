@@ -8,14 +8,14 @@ class BaseAuth {
 
     }
 
-    attempt(params) {
+    async attempt(params) {
         let user = null;
         if (this.provider.driver === 'database') {
             this.#forFind = new Core(this.provider.table);
-            user = this.#forFind.find(params);
+            user = await this.#forFind.find(params);
         } else if (this.provider.driver === 'eloquent') {
             this.#model = new this.provider.model();
-            user = this.#model.find('first', params);
+            user = await this.#model.find('first', params);
         }
         return user;
     }

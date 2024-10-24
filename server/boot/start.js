@@ -27,7 +27,7 @@ app.set('view engine', 'ejs');
 app.use((req, res, next) => {
     res.locals.config = (value) => Configure.read(value);
     res.locals.auth = () => new Auth(req);
-    req.auth = new Auth(req);
+    req.auth = () => new Auth(req);
     next();
 });
 

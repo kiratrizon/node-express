@@ -1,91 +1,53 @@
-const sqlite3 = require('better-sqlite3');
 const mysql = require('mysql2');
 require('dotenv').config();
-const path = require('path');
 
 class DatabaseConnection {
-    debugger;
-    databaseType;
-    connection;
     constructor() {
-        this.databaseType = process.env.DATABASE_TYPE;
-        this.debugger = (process.env.DEBUGGER || 'false') === 'true';
 
-        if (this.databaseType === 'mysql') {
-            this.connection = mysql.createConnection({
-                host: process.env.MYSQL_HOST,
-                user: process.env.MYSQL_USER,
-                password: process.env.MYSQL_PASSWORD,
-                database: process.env.MYSQL_DATABASE,
-            });
-            this.connection.connect((err) => {
+    }
+
+    openConnection() {
+        this.connection = mysql.createConnection({
+            host: process.env.MYSQL_ADDON_HOST,
+            user: process.env.MYSQL_ADDON_USER,
+            password: process.env.MYSQL_ADDON_PASSWORD,
+            database: process.env.MYSQL_ADDON_DB,
+        });
+
+        // Connect to the MySQL database
+        this.connection.connect(err => {
+            if (err) {
+                console.error('Error connecting to MySQL database:', err.message);
+                process.exit(1); // Exit if connection fails
+            } else {
+                console.log('Connected to MySQL database');
+            }
+        });
+    }
+
+    // Method to run a query
+    async runQuery(query, params = []) {
+        this.openConnection();
+        return new Promise((resolve, reject) => {
+            this.connection.query(query, params, (err, results) => {
                 if (err) {
-                    console.error('Error connecting to MySQL database:', err.message);
-                } else {
-                    console.log('Connected to MySQL database.');
+                    return reject(err);
                 }
+                resolve(results); // For SELECT, returns the result set
             });
-        } else if (this.databaseType === 'sqlite') {
-            try {
-                // const dbPath = process.env.SQLITE_FILE;
-                // const dbPath = './database/database.sqlite';
-                const dbPath = path.join(__dirname, '..', 'database', 'database.sqlite');
-                this.connection = new sqlite3(dbPath);
-            } catch (err) {
-                console.error('Error connecting to SQLite database:', err.message);
-            }
-        } else {
-            throw new Error('Unsupported database type');
-        }
+        });
     }
 
-    // Method to run a query (for SQLite and MySQL)
-    runQuery(query, params = []) {
-        if (this.databaseType === 'mysql') {
-            return new Promise((resolve, reject) => {
-                this.connection.query(query, params, (err, results) => {
-                    if (err) {
-                        return reject(err);
-                    }
-                    resolve(results); // For SELECT, returns the result set
-                });
-            });
-        } else if (this.databaseType === 'sqlite') {
-            try {
-                if (query.trim().toLowerCase().startsWith('select')) {
-                    return this.connection.prepare(query).all(...params); // For SELECT
-                } else {
-                    const stmt = this.connection.prepare(query);
-                    const info = stmt.run(...params); // For INSERT, UPDATE, DELETE
-                    return { changes: info.changes, lastID: info.lastInsertRowid }; // Return changes and last ID
-                }
-            } catch (err) {
-                throw new Error(`SQLite query error: ${err.message}`);
-            }
-        }
-    }
-
-    // Method to close the connection
+    // Optional: Method to close the connection
     close() {
-        if (this.databaseType === 'mysql') {
-            this.connection.end((err) => {
-                if (err) {
-                    console.error('Error closing MySQL database:', err.message);
-                } else {
-                    console.log('MySQL connection closed.');
-                }
-            });
-        } else if (this.databaseType === 'sqlite') {
-            try {
-                this.connection.close();
-                console.log('SQLite connection closed.');
-            } catch (err) {
-                console.error('Error closing SQLite database:', err.message);
+        this.connection.end(err => {
+            if (err) {
+                console.error('Error closing the MySQL connection:', err.message);
+            } else {
+                console.log('MySQL connection closed.');
             }
-        }
+        });
     }
-
-    // Additional methods for handling other types of queries can be added here
 }
 
 module.exports = DatabaseConnection;
