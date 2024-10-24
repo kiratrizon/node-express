@@ -2,12 +2,12 @@ const DatabaseConnection = require('../../database/database');
 
 class Migrator {
 
-    constructor(){
+    constructor() {
         this.db = new DatabaseConnection();
         this.sql = [];
     }
 
-    migrate(){
+    migrate() {
         this.sql.forEach((sql) => {
             try {
                 this.db.runQuery(sql);
@@ -17,7 +17,7 @@ class Migrator {
             }
         });
     }
-    addSql(sql){
+    addSql(sql) {
         this.sql.push(sql);
     }
 }

@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const Admin = require('../../../libs/Model/Admin');
-const Validator = require('../../../libs/Middleware/Validator');
+
 
 class AdminApi {
   constructor() {
@@ -21,6 +21,7 @@ class AdminApi {
       email: 'required|email|unique:admins',
       password: 'required|min:6|confirmed',
     };
+    const Validator = require('../../../libs/Middleware/Validator');
     let validate = Validator.make(req, rules);
     const ruleKeys = Object.keys(rules);
     let newData = {};

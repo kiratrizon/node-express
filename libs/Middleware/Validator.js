@@ -87,7 +87,7 @@ class Validator {
         }
 
         return returnData;
-    }  
+    }
 
     #validateEmail(value) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -106,10 +106,10 @@ class Validator {
      */
     fails() {
         let returnData = (Object.keys(this.errors).length > 0) ? true : false;
-        if (returnData){
+        if (returnData) {
             let returnKeys = {};
             Object.keys(this.#data).forEach(key => {
-                if (this.#data[key] !== '' && this.#data[key] !== null && typeof this.#data[key] !== 'undefined' && this.#data[key]){
+                if (this.#data[key] !== '' && this.#data[key] !== null && typeof this.#data[key] !== 'undefined' && this.#data[key]) {
                     returnKeys[key] = this.#data[key];
                 }
             });
@@ -125,7 +125,7 @@ class Validator {
      * @param {Object} [params={}] - Optional parameters for validation rules.
      * @returns {void} This function does not return a value. It handles validation.
      */
-    make(data = {}, params = {}){
+    make(data = {}, params = {}) {
         this.#initialize();
         this.params = params;
         this.#data = data;
