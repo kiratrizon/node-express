@@ -12,7 +12,10 @@ const DatabaseConnection = require('../../database/database');
 const app = express();
 
 app.use(session({
-    store: new SQLiteStore(DatabaseConnection),
+    store: new SQLiteStore({
+        db: 'sessions.sqlite',
+        dir: 'tmp',
+    }),
     secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
     saveUninitialized: false,
