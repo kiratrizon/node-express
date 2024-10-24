@@ -7,7 +7,7 @@ const flash = require('connect-flash');
 const Configure = require('../../libs/Service/Configure');
 const Auth = require('../../libs/Middleware/Auth');
 const fs = require('fs');
-const DatabaseConnection = require('../../database/database');
+// const DatabaseConnection = require('../../database/database');
 
 const app = express();
 
