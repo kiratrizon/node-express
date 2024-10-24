@@ -36,6 +36,12 @@ function ucFirst(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
+app.get('/admin', (req, res) => {
+    res.send('Hello, World!');
+});
 
 const adminRouter = require('../app/Admin/Route/router');
 const userRouter = require('../app/User/Route/router');
@@ -46,13 +52,6 @@ app.use('/admin', view('Admin'), adminRouter);
 app.use('/', view(), userRouter);
 
 app.use('/api', apiRouter);
-
-app.get('/', (req, res) => {
-    res.send('Hello, World!');
-});
-app.get('/admin', (req, res) => {
-    res.send('Hello, World!');
-});
 
 app.get('/debug', (req, res) => {
     if ((process.env.SESSION_DEBUG || 'false') === 'true') {
