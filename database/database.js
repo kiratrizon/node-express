@@ -27,8 +27,8 @@ class DatabaseConnection {
             });
         } else if (this.databaseType === 'sqlite') {
             try {
-                const dbPath = process.env.SQLITE_FILE;
-                // const dbPath = '/tmp/sessions.sqlite';
+                // const dbPath = process.env.SQLITE_FILE;
+                const dbPath = './database/database.sqlite';
                 // const dbPath = path.join(__dirname, '..', 'tmp', 'sessions.sqlite');
                 this.connection = new sqlite3(dbPath);
             } catch (err) {
