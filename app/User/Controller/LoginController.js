@@ -19,7 +19,7 @@ class LoginController extends Controller {
 			error: req.flash("error")[0] || {},
 			old: req.flash("old")[0] || {},
 		};
-		res.render("login", data);
+		res.render("Login/", data);
 	}
 	postLogin(req, res, next) {
 		try {
