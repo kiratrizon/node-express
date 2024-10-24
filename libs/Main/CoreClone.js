@@ -3,7 +3,8 @@ const DatabaseConnection = require('../../database/database');
 class Core {
     constructor(tableName) {
         this.tableName = tableName;
-        this.debug = DatabaseConnection.debugger;
+        this.db = new DatabaseConnection();
+        this.debug = this.db.debugger;
         this.values = [];
     }
 
@@ -19,7 +20,7 @@ class Core {
         }
 
         try {
-            let data = DatabaseConnection.runQuery(sql, this.values)[0];
+            let data = this.db.runQuery(sql, this.values)[0];
             return data ? data : null;
         } catch (error) {
             console.error("Error executing query:", error);

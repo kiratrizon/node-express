@@ -88,4 +88,4 @@ class DatabaseConnection {
     // Additional methods for handling other types of queries can be added here
 }
 
-module.exports = new DatabaseConnection();
+module.exports = DatabaseConnection;

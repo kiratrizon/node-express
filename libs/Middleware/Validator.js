@@ -39,7 +39,7 @@ class Validator {
         this.errors = {};
         this.old = {};
         this.validRules = validRules;
-        this.database = DatabaseConnection;
+        this.database = new DatabaseConnection();
     }
     #validate(key, ruleName, ruleValue = undefined) {
         let returnData = true;

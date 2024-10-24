@@ -5,7 +5,8 @@ class Core {
     timestamps = true;
     constructor(tableName) {
         this.tableName = tableName;
-        this.debug = DatabaseConnection.debugger;
+        this.db = new DatabaseConnection();
+        this.debug = this.db.debugger;
         this.values = [];
     }
 
@@ -39,7 +40,7 @@ class Core {
         }
 
         try {
-            let data = DatabaseConnection.runQuery(sql, this.values);
+            let data = this.db.runQuery(sql, this.values);
             return type === 'first' ? data[0] : data;
         } catch (error) {
             console.error("Error executing query:", error);
@@ -61,7 +62,7 @@ class Core {
         }
 
         try {
-            let data = DatabaseConnection.runQuery(sql, this.values)[0];
+            let data = this.db.runQuery(sql, this.values)[0];
             return data;
         } catch (error) {
             console.error("Error executing query:", error);
@@ -277,7 +278,7 @@ class Core {
         const values = Object.values(data);
     
         try {
-            const result = DatabaseConnection.runQuery(sql, values);
+            const result = this.db.runQuery(sql, values);
             return result;
         } catch (error) {
             throw new Error(`Error inserting data: ${error.message}`);
