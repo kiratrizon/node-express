@@ -12,10 +12,10 @@ const fs = require('fs');
 const app = express();
 
 app.use(session({
-    store: new SQLiteStore({
-        db: 'sessions.sqlite',
-        dir: 'database'
-    }),
+    // store: new SQLiteStore({
+    //     db: 'sessions.sqlite',
+    //     dir: 'database'
+    // }),
     secret: process.env.MAIN_KEY || 'test-secret',
     resave: false,
     saveUninitialized: false,
