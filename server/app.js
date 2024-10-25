@@ -37,9 +37,8 @@ function view(type = 'User') {
         if (checkViewPathExists(type, reqPath)) {
             viewPath = path.join(__dirname, '..', 'app', type, 'View', reqPath);
         } else {
-            viewPath = path.join(__dirname, '..');
+            viewPath = path.join(__dirname, '..', 'app', type, 'View', 'Defaults');
         }
-        console.log(viewPath);
         app.set('views', viewPath);
         next();
     };
