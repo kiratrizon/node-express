@@ -2,4 +2,3 @@
 request.rest
 sessions
 .env
-.env.example
