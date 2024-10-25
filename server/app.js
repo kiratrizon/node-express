@@ -1,6 +1,5 @@
 const app = require('./boot/start');
 const path = require('path');
-require('dotenv').config();
 const fs = require('fs');
 
 // your session here
@@ -66,7 +65,7 @@ app.get('/admin', (req, res) => {
 });
 
 app.get('/debug', (req, res) => {
-    if ((process.env.SESSION_DEBUG || 'false') === 'true') {
+    if (true) {
         return res.send(req.session.auth);
     }
     return res.status(403).send('Debug mode is disabled.');

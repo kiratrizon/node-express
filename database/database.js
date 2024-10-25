@@ -1,24 +1,24 @@
 const mysql = require('mysql2');
-require('dotenv').config();
 
 class DatabaseConnection {
     constructor() {
-
+        this.debugger = false;
     }
 
     openConnection() {
         this.connection = mysql.createConnection({
-            host: process.env.MYSQL_ADDON_HOST,
-            user: process.env.MYSQL_ADDON_USER,
-            password: process.env.MYSQL_ADDON_PASSWORD,
-            database: process.env.MYSQL_ADDON_DB,
+            host: 'b1ki8scs0geezffy22p1-mysql.services.clever-cloud.com',
+            user: 'ualy6i6qmmmcyh7h',
+            password: 'MlxVnqezy1jZ5uz5X1LI',
+            database: 'b1ki8scs0geezffy22p1',
+            port: 3306
         });
 
         // Connect to the MySQL database
         this.connection.connect(err => {
             if (err) {
                 console.error('Error connecting to MySQL database:', err.message);
-                process.exit(1); // Exit if connection fails
+                process.exit(1);
             } else {
                 console.log('Connected to MySQL database');
             }
@@ -33,12 +33,11 @@ class DatabaseConnection {
                 if (err) {
                     return reject(err);
                 }
-                resolve(results); // For SELECT, returns the result set
+                resolve(results);
             });
         });
     }
 
-    // Optional: Method to close the connection
     close() {
         this.connection.end(err => {
             if (err) {

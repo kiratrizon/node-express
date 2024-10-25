@@ -22,6 +22,7 @@ class Core {
 
         try {
             const data = await this.db.runQuery(sql, this.values);
+            this.db.close();
             return data[0] ? data[0] : null; // Ensure it returns null if no data found
         } catch (error) {
             console.error("Error executing query:", error);
