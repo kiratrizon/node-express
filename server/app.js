@@ -33,12 +33,14 @@ function checkViewPathExists(type, reqPath) {
 function view(type = 'User') {
     return (req, res, next) => {
         let reqPath = ucFirst(req.path.split('/')[1]);
-
+        let viewPath;
         if (checkViewPathExists(type, reqPath)) {
-            app.set('views', path.join(__dirname, '..', 'app', type, 'View', reqPath));
+            viewPath = path.join(__dirname, '..', 'app', type, 'View', reqPath);
         } else {
-            app.set('views', path.join(__dirname, '..'));
+            viewPath = path.join(__dirname, '..');
         }
+        console.log(viewPath);
+        app.set('views', viewPath);
         next();
     };
 }
